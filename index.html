@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chúc Mừng Sinh Nhật!</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: #000; /* Nền đen để nổi bật pháo hoa */
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+            color: white;
+            text-align: center;
+        }
+
+        .container {
+            z-index: 10;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 2px solid #ff69b4;
+            box-shadow: 0 0 20px #ff69b4;
+        }
+
+        h1 {
+            font-size: 3rem;
+            color: #ff69b4;
+            text-shadow: 0 0 10px #fff;
+            margin-bottom: 20px;
+        }
+
+        p {
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+        }
+
+        .btn-group {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        button {
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: 0.3s;
+            font-weight: bold;
+        }
+
+        #btnYes {
+            background-color: #ff69b4;
+            color: white;
+            box-shadow: 0 0 15px #ff69b4;
+        }
+
+        #btnYes:hover {
+            transform: scale(1.2);
+        }
+
+        /* Hiệu ứng pháo hoa Canvas */
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="canvas"></canvas>
+
+    <div class="container">
+        <h1 id="title">Chúc Mừng Sinh Nhật Nanh! 🎂</h1>
+        
+        <p id="message">Hôm nay em có thấy anh đẹp trai không?</p>
+
+        <div class="btn-group">
+            <button id="btnYes" onclick="celebrate()">CÓ!</button>
+            <button id="btnNo">KHÔNG</button>
+        </div>
+    </div>
+
+    <audio id="bgMusic" loop>
+        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        const btnNo = document.getElementById('btnNo');
+        const btnYes = document.getElementById('btnYes');
+        const title = document.getElementById('title');
+        const bgMusic = document.getElementById('bgMusic');
+
+        // Logic "Yes or Yes": Nút Không sẽ chạy trốn khi rê chuột vào
+        btnNo.addEventListener('mouseover', () => {
+            const x = Math.random() * (window.innerWidth - btnNo.offsetWidth);
+            const y = Math.random() * (window.innerHeight - btnNo.offsetHeight);
+            btnNo.style.position = 'absolute';
+            btnNo.style.left = x + 'px';
+            btnNo.style.top = y + 'px';
+        });
+
+        // Khi bấm nút Không cũng sẽ tính là chọn Có (cho chắc ăn)
+        btnNo.addEventListener('click', () => {
+            celebrate();
+        });
+
+        function celebrate() {
+            // // THAY ĐỔI THÔNG BÁO KHI BẤM CHỌN TẠI ĐÂY
+            alert("Biết ngay mà! Chúc mừng sinh nhật em yêu ❤️");
+            bgMusic.play(); // Bật nhạc
+            startFirevorks(); // Kích hoạt pháo hoa mạnh hơn
+        }
+
+        // --- CODE PHÁO HOA ---
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        let particles = [];
+
+        class Particle {
+            constructor(x, y, color) {
+                this.x = x;
+                this.y = y;
+                this.color = color;
+                this.velocity = {
+                    x: (Math.random() - 0.5) * 8,
+                    y: (Math.random() - 0.5) * 8
+                };
+                this.alpha = 1;
+                this.friction = 0.95;
+            }
+
+            draw() {
+                ctx.globalAlpha = this.alpha;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, 2, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+            }
+
+            update() {
+                this.velocity.x *= this.friction;
+                this.velocity.y *= this.friction;
+                this.x += this.velocity.x;
+                this.y += this.velocity.y;
+                this.alpha -= 0.01;
+            }
+        }
+
+        function createFirework(x, y) {
+            const color = `hsl(${Math.random() * 360}, 50%, 50%)`;
+            for (let i = 0; i < 50; i++) {
+                particles.push(new Particle(x, y, color));
+            }
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            particles.forEach((p, i) => {
+                if (p.alpha > 0) {
+                    p.update();
+                    p.draw();
+                } else {
+                    particles.splice(i, 1);
+                }
+            });
+        }
+
+        setInterval(() => {
+            createFirework(Math.random() * canvas.width, Math.random() * canvas.height);
+        }, 800);
+
+        animate();
+    </script>
+</body>
+</html>
